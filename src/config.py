@@ -46,10 +46,10 @@ class CORSConfig(Struct):
     allow_origins: list[str] = field(default_factory=lambda: ["*"])
     allow_methods: list[HTTPMethod] = field(default_factory=lambda: ["*"])
     allow_headers: list[str] = field(default_factory=lambda: ["*"])
-    allow_credentials: bool = field(default=False)
-    allow_origin_regex: str | None = field(default=None)
-    expose_headers: list[str] = field(default=[])
-    max_age: int = field(default=600)
+    allow_credentials: bool = False
+    allow_origin_regex: str | None = None
+    expose_headers: list[str] = []
+    max_age: int = 600
 
     def to_litestar(self) -> LitestarCORSConfig:
         return LitestarCORSConfig(
