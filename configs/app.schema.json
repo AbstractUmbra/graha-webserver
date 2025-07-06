@@ -1,0 +1,103 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://static.abstracumbra.dev/schemas/graha-webserver.json",
+    "title": "Graha T'ia Webserver",
+    "description": "Config for the Graha T'ia discord bot backend.",
+    "type": "object",
+    "properties": {
+        "debug": {
+            "description": "Whether to run the app in debug mode or not.",
+            "type": "boolean"
+        },
+        "allowed_hosts": {
+            "description": "Config key:value based around the AllowedHosts protection.",
+            "type": "object",
+            "properties": {
+                "allowed_hosts": {
+                    "description": "Array of allowed host names.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                }
+            },
+            "required": [
+                "allowed_hosts"
+            ]
+        },
+        "compression": {
+            "description": "Config key:value based around the compression to use for the site",
+            "type": "object",
+            "properties": {
+                "backend": {
+                    "description": "The compression backend to use",
+                    "type": "string",
+                    "enum": [
+                        "gzip",
+                        "brotli"
+                    ]
+                }
+            },
+            "required": [
+                "backend"
+            ]
+        },
+        "cors": {
+            "description": "Config key:value based around the CORS protection for the site",
+            "type": "object",
+            "properties": {
+                "allow_origins": {
+                    "description": "The allowed origins for CORS related protection",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                }
+            },
+            "required": [
+                "allow_origins"
+            ]
+        },
+        "csrf": {
+            "description": "Config key:value based around the CSRF protection for the site",
+            "type": "object",
+            "properties": {
+                "secret": {
+                    "description": "The CSRF secret to use. This should be `null` in production and proper secret management should be used.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            }
+        },
+        "response_cache": {
+            "description": "Config key:value based around the response cache to use for the site",
+            "type": "object",
+            "properties": {
+                "default_expiration": {
+                    "description": "The time value in seconds for how long to cache responses.",
+                    "type": "integer",
+                    "minimum": 10,
+                    "exclusiveMaximum": 3600,
+                    "multipleOf": 10
+                }
+            },
+            "required": [
+                "default_expiration"
+            ]
+        },
+        "required": [
+            "debug",
+            "allowed_hosts",
+            "compression",
+            "cors",
+            "csrf",
+            "response_cache"
+        ]
+    }
+}
