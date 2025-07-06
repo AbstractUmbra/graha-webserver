@@ -1,0 +1,10 @@
+**/__pycache__/
+**/*.py[cod]
+
+.git/
+.github/
+.venv/
+.vscode/
+.ruff_cache/
+.gitignore
+.gitmodules

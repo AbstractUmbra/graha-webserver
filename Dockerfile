@@ -1,10 +1,11 @@
-ARG PYTHON_BASE=3.13-slim-bookworm
-ARG UV_BASE=python3.13-bookworm-slim
+ARG PYTHON_BASE=3.12-slim-bookworm
+ARG UV_BASE=python3.12-bookworm-slim
 
 FROM ghcr.io/astral-sh/uv:${UV_BASE} AS builder
 
 ENV UV_PYTHON_DOWNLOADS=0
 
+WORKDIR /project
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=/project/pyproject.toml \
     --mount=type=bind,source=uv.lock,target=/project/uv.lock \

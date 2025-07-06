@@ -3,7 +3,7 @@ name = "webserver"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13, <4.0"
+requires-python = ">=3.12, <4.0"
 dependencies = [
     "brotli>=1.1.0",
     "litestar[standard]>=2.16.0",
@@ -12,7 +12,7 @@ dependencies = [
 
 [tool.ruff]
 line-length = 125
-target-version = "py313"
+target-version = "py312"
 
 [tool.ruff.lint]
 preview = true
@@ -104,7 +104,7 @@ allow-dict-calls-with-keyword-arguments = true
 include = ["src/**/*.py"]
 exclude = ["**/__pycache__", "build", "dist", "docs"]
 useLibraryCodeForTypes = true
-pythonVersion = "3.13"
+pythonVersion = "3.12"
 pythonPlatform = "All"
 # strict doesn't allow turning off / downgrading severity of rules
 typeCheckingMode = "standard"

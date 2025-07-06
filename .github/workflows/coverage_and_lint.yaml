@@ -1,0 +1,53 @@
+name: Type Coverage and Linting
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types: [opened, reopened, synchronize]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.12' ]
+
+    name: "Type Coverage and Linting @ ${{ matrix.python-version }}"
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: "true"
+
+      - name: Setup uv @ ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v6
+        with:
+          activate-environment: true
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install deps @ ${{ matrix.python-version }}
+        run: |
+          uv sync --all-extras --all-groups
+
+      - name: "Run Pyright @ ${{ matrix.python-version }}"
+        uses: jakebailey/pyright-action@v2
+        with:
+          warnings: false
+          annotate: "${{ matrix.python-version != '3.x' }}"
+
+      - name: Lint check
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: check .
+
+      - name: Formatting check
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: format --check
