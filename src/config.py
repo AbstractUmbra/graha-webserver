@@ -77,10 +77,22 @@ class ResponseCacheConfig(Struct):
         return LitestarResponseCacheConfig(default_expiration=self.default_expiration)
 
 
+class DatabaseConfig(Struct):
+    host: str
+    user: str
+    db: str
+
+    def to_dsn(self) -> str:
+        passwd = resolve_docker_secret("POSTGRES_PASSWORD")
+        return f"postgres://{self.user}:{passwd}@{self.host}/{self.db}"
+
+
 class Config(Struct):
     """Required config for backend server."""
 
     debug: bool
+    version: str
+    database: DatabaseConfig
     allowed_hosts: AllowedHostsConfig
     compression: CompressionConfig
     cors: CORSConfig

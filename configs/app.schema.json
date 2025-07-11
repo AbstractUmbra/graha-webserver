@@ -9,6 +9,33 @@
             "description": "Whether to run the app in debug mode or not.",
             "type": "boolean"
         },
+        "version": {
+            "description": "The version of the app server",
+            "type": "string"
+        },
+        "database": {
+            "description": "Config key:value based around database connection details.",
+            "type": "object",
+            "properties": {
+                "host": {
+                    "description": "The hostname to connect to.",
+                    "type": "string"
+                },
+                "user": {
+                    "description": "The user to authenticate as.",
+                    "type": "string"
+                },
+                "db": {
+                    "description": "The database to connect to.",
+                    "type": "str"
+                }
+            },
+            "required": [
+                "host",
+                "user",
+                "db"
+            ]
+        },
         "allowed_hosts": {
             "description": "Config key:value based around the AllowedHosts protection.",
             "type": "object",
@@ -93,6 +120,8 @@
         },
         "required": [
             "debug",
+            "version",
+            "database",
             "allowed_hosts",
             "compression",
             "cors",
