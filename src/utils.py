@@ -4,11 +4,16 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 
+import logging
 import os
 import pathlib
 from typing import Literal, overload
 
+import msgspec
+
 __all__ = ("resolve_docker_secret",)
+
+LOGGER = logging.getLogger("graha-utils")
 
 
 @overload
@@ -59,3 +64,30 @@ def resolve_docker_secret(secret_name: str, *, content: bool = True) -> pathlib.
 
     msg_ = f"Unable to find provided secret by name: {secret_name!r}."
     raise ValueError(msg_)
+
+
+@overload
+def load_config_type[ConfigT: msgspec.Struct](
+    path: pathlib.Path, type_: type[ConfigT], *, required: Literal[False]
+) -> ConfigT | None: ...
+
+
+@overload
+def load_config_type[ConfigT: msgspec.Struct](
+    path: pathlib.Path, type_: type[ConfigT], *, required: Literal[True] = ...
+) -> ConfigT: ...
+
+
+def load_config_type[ConfigT: msgspec.Struct](
+    path: pathlib.Path, type_: type[ConfigT], *, required: bool = True
+) -> ConfigT | None:
+    path = path.resolve()
+    if not path.exists():
+        if required:
+            msg_ = f"Required config file not found at {path}."
+            raise RuntimeError(msg_)
+        LOGGER.warning("Config file not found at path %r, skipping.", str(path))
+        return None
+
+    with path.open("rb") as fp:
+        return msgspec.json.decode(fp.read(), type=type_)
