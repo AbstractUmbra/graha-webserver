@@ -11,7 +11,7 @@ from typing import Literal, overload
 
 import msgspec
 
-__all__ = ("resolve_docker_secret",)
+__all__ = ("load_config_type", "resolve_docker_config", "resolve_docker_secret")
 
 LOGGER = logging.getLogger("graha-utils")
 
@@ -44,26 +44,59 @@ def resolve_docker_secret(secret_name: str, *, content: bool = True) -> pathlib.
     Returns
     -------
     :class:`pathlib.Path` | :class:`str`
-    """  # noqa: D401, DOC501 # not very appropriate here
+    """  # noqa: D401 # not very appropriate here
     secret_file_docker_env = os.getenv(f"{secret_name.upper()}_FILE")
 
-    if secret_file_docker_env:
-        path = pathlib.Path(secret_file_docker_env)
-        if not path.exists():
-            msg = f"Docker standard path to secret ({secret_name}) file provided but the file does not exist."
-            raise RuntimeError(msg)
-        if content is True:
-            return path.read_text("utf-8").strip()
-        return path
+    path = (
+        pathlib.Path(secret_file_docker_env) if secret_file_docker_env else pathlib.Path(f"/var/run/secrets/{secret_name}")
+    )
 
-    secret_file = pathlib.Path(f"/var/run/secrets/{secret_name}")
-    if secret_file.exists():
-        if content is True:
-            return secret_file.read_text("utf-8").strip()
-        return secret_file
+    if not path.exists():
+        msg = f"Docker standard path to secret ({secret_name}) file provided but the file does not exist."
+        raise ValueError(msg)
 
-    msg_ = f"Unable to find provided secret by name: {secret_name!r}."
-    raise ValueError(msg_)
+    if content is True:
+        return path.read_text("utf-8").strip()
+    return path
+
+
+def resolve_docker_config(*, config_name: str | None = None, env_var_name: str | None = None) -> pathlib.Path:
+    """Utility for resolving a configuration item from docker-compose provided ``configs:``.
+
+    Parameters
+    ----------
+    config_name: :class:`str` | None
+        The name of the config key in docker-compose. NOT the path to the config file.
+    env_var_name: :class:`str` | None
+        The name of the env var which dictates the path to the config file, if any.
+
+    Raises
+    ------
+    ValueError
+        One of the provided values did not fully resolve to a configuration file or spec.
+    RuntimeError
+        The resolved path to the configuration file did not exist.
+
+    Returns
+    -------
+    :class:`pathlib.Path`
+    """  # noqa: D401
+    if config_name:
+        path = pathlib.Path(f"/{config_name}")
+    elif env_var_name:
+        env_var = os.getenv(env_var_name.upper())
+        if not env_var:
+            raise ValueError("The provided environment variable does not exist.")
+        path = pathlib.Path(env_var)
+    else:
+        raise ValueError("At least one of `config_name` or `env_var_name` must be provided.")
+
+    path = path.resolve()
+
+    if not path.exists():
+        raise RuntimeError("The provided configuration name or env var does not resolve to locatable file.")
+
+    return path
 
 
 @overload
@@ -81,6 +114,29 @@ def load_config_type[ConfigT: msgspec.Struct](
 def load_config_type[ConfigT: msgspec.Struct](
     path: pathlib.Path, type_: type[ConfigT], *, required: bool = True
 ) -> ConfigT | None:
+    """
+    Method to load a provided path and parse it as a JSONified msgspec.Struct.
+
+    Parameters
+    ----------
+    path: :class:`pathlib.Path`
+        The path to the file.
+    type_ Type[:class:`msgspec.Struct`]
+        The custom subclass of Struct to parse as.
+    required: :class:`bool`
+        Whether this configuration is required for the application, or allowed to not exist.
+        Defaults to ``True``.
+
+    Raises
+    ------
+    RuntimeError
+        If the config is not required but could not be parsed or found.
+
+    Returns
+    -------
+    :class:`msgspec.Struct`
+        The custom struct type you passed for ``type_``.
+    """  # noqa: D401
     path = path.resolve()
     if not path.exists():
         if required:

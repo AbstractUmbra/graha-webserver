@@ -4,7 +4,6 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 
-import os
 from pathlib import Path
 
 from litestar import Litestar
@@ -25,11 +24,11 @@ from litestar.static_files import create_static_files_router
 from litestar_asyncpg import AsyncpgConfig, AsyncpgPlugin, PoolConfig
 
 from .config import Config
-from .utils import load_config_type
+from .utils import load_config_type, resolve_docker_config
 
-_app_config_file_path = os.getenv("CONFIG_FILE", "configs/app.json")
+__all__ = ("app",)
 
-CONFIG = load_config_type(Path(_app_config_file_path), Config)
+CONFIG = load_config_type(resolve_docker_config(env_var_name="CONFIG_PATH"), Config)
 
 STATIC_DIRECTORY = Path("static/").resolve()
 RESOURCES_DIRECTORY = Path("resources/").resolve()

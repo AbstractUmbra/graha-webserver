@@ -8,3 +8,8 @@
 .ruff_cache/
 .gitignore
 .gitmodules
+configs/
+README.md
+csrf_token.txt
+Dockerfile
+docker-compose.yaml
