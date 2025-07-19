@@ -2,7 +2,8 @@
 name = "webserver"
 version = "0.1.0"
 description = "Add your description here"
-readme = "README.md"
+readme = { file = "README.md" }
+license = { file = "LICENSE" }
 requires-python = ">=3.12, <4.0"
 dependencies = [
     "brotli>=1.1.0",
@@ -105,6 +106,8 @@ allow-dict-calls-with-keyword-arguments = true
 [tool.pyright]
 include = ["src/**/*.py"]
 exclude = ["**/__pycache__", "build", "dist", "docs"]
+venv = ".venv/"
+venvPath = "."
 useLibraryCodeForTypes = true
 pythonVersion = "3.12"
 pythonPlatform = "All"
