@@ -1,3 +1,5 @@
+"""Placeholder for now."""
+
 import os
 
 import uvicorn
