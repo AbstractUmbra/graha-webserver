@@ -27,6 +27,7 @@ ignore = [
     "CPY001",   # can't detect MPL for some reason
     "D205",     # Not very intelligently identified
     "D404",     # I like this form of prose
+    "D420",
     "EM101",    # in this case this is okay
     "F401",
     "F402",
